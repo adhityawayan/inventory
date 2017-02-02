@@ -25,5 +25,16 @@
 			$("#btn_cetak_surat_jalan").trigger('click');
 		}
 
+
+		$("#ket_keluar").keyup(function(){
+			var value = $(this).val();
+			$.post("<?php echo site_url('motif_keluar/set_keterangan'); ?>",{
+				'ket' : value,
+				'motif_keluar_id' : <?php echo $this->uri->segment(3); ?>
+			},function(data){
+
+			});
+		});
+
 	});
 </script>

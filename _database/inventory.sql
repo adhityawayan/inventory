@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
+-- version 4.5.2
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Jan 11, 2017 at 07:55 AM
--- Server version: 10.1.16-MariaDB
--- PHP Version: 5.6.24
+-- Host: localhost
+-- Generation Time: Jan 23, 2017 at 04:23 PM
+-- Server version: 10.1.19-MariaDB
+-- PHP Version: 5.6.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -189,9 +189,9 @@ CREATE TABLE `motif` (
 --
 
 INSERT INTO `motif` (`id`, `nama`, `qty`, `harga`, `ket`, `type_id`, `barang_id`) VALUES
-(1, 'Motif A', 200, 0, '-', 0, 0),
+(1, 'Motif A', 13, 0, '-', 1, 1),
 (2, 'Motif B', 0, 0, '', 0, 0),
-(3, 'Motif C', 78, 4000, '', 1, 0),
+(3, 'Motif C', 76, 4000, '', 1, 0),
 (4, 'Motif D', 5, 4000, 'adasdasd', 1, 2);
 
 -- --------------------------------------------------------
@@ -228,6 +228,7 @@ CREATE TABLE `motif_keluar` (
   `tanggal` date DEFAULT NULL,
   `customer_id` int(11) DEFAULT '0',
   `user_id` int(11) DEFAULT '0',
+  `keterangan` text,
   `tersimpan` varchar(5) NOT NULL DEFAULT 'belum'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -235,8 +236,11 @@ CREATE TABLE `motif_keluar` (
 -- Dumping data for table `motif_keluar`
 --
 
-INSERT INTO `motif_keluar` (`id`, `created_on`, `tanggal`, `customer_id`, `user_id`, `tersimpan`) VALUES
-(1, '2017-01-11 10:18:06', '2017-01-02', 1, 1, 'belum');
+INSERT INTO `motif_keluar` (`id`, `created_on`, `tanggal`, `customer_id`, `user_id`, `keterangan`, `tersimpan`) VALUES
+(1, '2017-01-19 06:06:49', '2017-01-11', 1, 1, NULL, 'sudah'),
+(2, '2017-01-19 06:10:32', '2017-01-12', 1, 1, NULL, 'sudah'),
+(3, '2017-01-19 06:42:43', '2017-01-19', 1, 1, 'tes catatan keterangan', 'sudah'),
+(4, '2017-01-23 21:19:31', '2017-01-19', 1, 1, 'tes keterangan				\n										', 'sudah');
 
 -- --------------------------------------------------------
 
@@ -264,7 +268,12 @@ CREATE TABLE `motif_keluar_detail` (
 --
 
 INSERT INTO `motif_keluar_detail` (`id`, `motif_keluar_id`, `motif_id`, `barang_id`, `type_id`, `nama`, `motif`, `qty`, `harga`, `subtotal`, `ket`, `promo`) VALUES
-(1, 1, 1, 2, 1, 'Motif A', 'Motif A', 10, 0, 0, NULL, 'tidak');
+(1, 1, 3, 2, 1, 'Motif C', 'Motif C', 10, 4000, 8000, NULL, 'tidak'),
+(2, 2, 1, 1, 1, 'Motif A', 'Motif A', 10, 0, 0, NULL, 'tidak'),
+(3, 2, 1, 0, 0, 'Motif A', NULL, 4, 0, 0, 'PROMO', 'ya'),
+(5, 3, 1, 2, 1, 'Motif A', 'Motif A', 2, 0, 0, 'tes', 'tidak'),
+(6, 4, 1, 1, 1, 'Motif A', 'Motif A', 7, 0, 0, 'ini', 'tidak'),
+(7, 4, 0, 1, 1, 'Motif A', NULL, 1, 0, 0, 'PROMO', 'ya');
 
 -- --------------------------------------------------------
 
@@ -287,7 +296,8 @@ CREATE TABLE `motif_masuk` (
 --
 
 INSERT INTO `motif_masuk` (`id`, `created_on`, `tanggal`, `supplier_id`, `user_id`, `lampiran_surat_jalan`, `tersimpan`) VALUES
-(9, '2016-12-24 19:35:28', '2016-12-24', 1, 1, '7c0f5-dev.png', 'sudah');
+(9, '2016-12-24 19:35:28', '2016-12-24', 1, 1, '7c0f5-dev.png', 'sudah'),
+(10, '2017-01-19 11:53:35', '2017-01-19', 1, 1, 'efebc-father-with-children-raising-arms-silhouette-image.png', 'sudah');
 
 -- --------------------------------------------------------
 
@@ -313,7 +323,8 @@ CREATE TABLE `motif_masuk_detail` (
 --
 
 INSERT INTO `motif_masuk_detail` (`id`, `motif_masuk_id`, `motif_id`, `barang_id`, `type_id`, `nama`, `qty`, `harga`, `subtotal`, `ket`) VALUES
-(13, 9, 1, 1, 1, 'Motif A', 100, 0, 0, NULL);
+(13, 9, 1, 1, 1, 'Motif A', 100, 0, 0, NULL),
+(14, 10, 1, 2, 1, 'Motif A', 20, 0, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -323,7 +334,8 @@ INSERT INTO `motif_masuk_detail` (`id`, `motif_masuk_id`, `motif_id`, `barang_id
 
 CREATE TABLE `promo` (
   `id` int(11) NOT NULL,
-  `motif_id` int(11) NOT NULL DEFAULT '0',
+  `barang_id` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
   `beli` int(11) NOT NULL DEFAULT '0',
   `gratis` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -332,9 +344,8 @@ CREATE TABLE `promo` (
 -- Dumping data for table `promo`
 --
 
-INSERT INTO `promo` (`id`, `motif_id`, `beli`, `gratis`) VALUES
-(1, 1, 5, 2),
-(2, 3, 5, 1);
+INSERT INTO `promo` (`id`, `barang_id`, `type_id`, `beli`, `gratis`) VALUES
+(3, 1, 1, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -455,7 +466,10 @@ CREATE TABLE `surat_jalan` (
 --
 
 INSERT INTO `surat_jalan` (`id`, `motif_keluar_id`, `status_kirim`, `ship_to`, `nama_penerima`, `nama_customer`, `created_on`, `user_id`) VALUES
-(1, 2, 'ship_to', 'gfjgfjhgh', 'kghgh', 'Customer A', '2016-12-17 15:49:05', 1);
+(1, 2, 'kirim_langsung', '', 'kghgh', 'Customer A', '2016-12-17 15:49:05', 1),
+(2, 1, '-', '-', '-', 'Customer A', '2017-01-19 12:21:41', 1),
+(3, 3, 'kirim_langsung', '', 'penerima ABC', 'Customer A', '2017-01-23 19:05:21', 1),
+(7, 4, 'ship_to', 'ship to 2', 'nama penerima 2', 'Customer A', '2017-01-23 22:12:48', 1);
 
 -- --------------------------------------------------------
 
@@ -507,7 +521,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `salt`, `email`, `activation_code`, `forgotten_password_code`, `forgotten_password_time`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`) VALUES
-(1, '127.0.0.1', 'admin', '$2a$07$SeBknntpZror9uyftVopmu61qg0ms8Qv1yV6FG.kQOSM.9QhmTo36', '', 'admin@admin.com', '', NULL, NULL, NULL, 1268889823, 1484104587, 1, 'Admin', 'istrator', 'ADMIN', '0'),
+(1, '127.0.0.1', 'admin', '$2a$07$SeBknntpZror9uyftVopmu61qg0ms8Qv1yV6FG.kQOSM.9QhmTo36', '', 'admin@admin.com', '', NULL, NULL, NULL, 1268889823, 1485173036, 1, 'Admin', 'istrator', 'ADMIN', '0'),
 (2, '::1', 'karyawan', '$2y$08$cvDIDO5y51ngpuo80qQoiOlmOm3cp.e2t23HNspeaxeAfgejc/LKa', NULL, 'karyawan@asda.com', NULL, NULL, NULL, NULL, 1478661265, 1478663271, 1, 'karyawan', '-', '-', '000');
 
 -- --------------------------------------------------------
@@ -620,7 +634,16 @@ INSERT INTO `users_logs` (`id`, `datetime`, `user_id`, `url`, `keterangan`, `pos
 (45, '2016-12-21 08:11:31', 1, 'http://localhost:2808/inventory/motif_masuk/simpan', 'Admin istrator telah menambahkan motif masuk dengan supplier Supplier A', '{"motif_masuk_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"11","motif_masuk_id":"7","motif_id":"4","barang_id":"2","type_id":"1","nama":"Motif D","qty":"5","harga":"4000","subtotal":"20000","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_masuk_id":"7","supplier_id":"1"}'),
 (46, '2016-12-24 19:03:15', 1, 'http://localhost:2808/inventory/return_motif/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"return_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"2","return_id":"4","motif_id":"3","barang_id":"1","type_id":"1","nama":"Motif C","qty":"5","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"return_id":"4"}'),
 (47, '2016-12-24 19:08:02', 1, 'http://localhost:2808/inventory/motif_masuk/simpan', 'Admin istrator telah menambahkan motif masuk dengan supplier Supplier A', '{"motif_masuk_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"12","motif_masuk_id":"8","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","qty":"100","harga":"0","subtotal":"0","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_masuk_id":"8","supplier_id":"1"}'),
-(48, '2016-12-24 19:36:23', 1, 'http://localhost:2808/inventory/motif_masuk/simpan', 'Admin istrator telah menambahkan motif masuk dengan supplier Supplier A', '{"motif_masuk_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"13","motif_masuk_id":"9","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","qty":"100","harga":"0","subtotal":"0","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_masuk_id":"9","supplier_id":"1"}');
+(48, '2016-12-24 19:36:23', 1, 'http://localhost:2808/inventory/motif_masuk/simpan', 'Admin istrator telah menambahkan motif masuk dengan supplier Supplier A', '{"motif_masuk_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"13","motif_masuk_id":"9","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","qty":"100","harga":"0","subtotal":"0","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_masuk_id":"9","supplier_id":"1"}'),
+(49, '2017-01-19 06:07:46', 1, 'http://localhost:2808/inventory/motif_keluar/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"motif_keluar_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"1","motif_keluar_id":"1","motif_id":"3","barang_id":"2","type_id":"1","nama":"Motif C","motif":"Motif C","qty":"2","harga":"4000","subtotal":"8000","ket":null,"promo":"tidak"}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_keluar_id":"1","customer_id":"1"}'),
+(50, '2017-01-19 06:18:39', 1, 'http://localhost:2808/inventory/motif_keluar/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"motif_keluar_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"2","motif_keluar_id":"2","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","motif":"Motif A","qty":"10","harga":"0","subtotal":"0","ket":null,"promo":"tidak"},{"id":"3","motif_keluar_id":"2","motif_id":"1","barang_id":"0","type_id":"0","nama":"Motif A","motif":null,"qty":"4","harga":"0","subtotal":"0","ket":"PROMO","promo":"ya"}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_keluar_id":"2","customer_id":"1"}'),
+(51, '2017-01-19 06:24:09', 1, 'http://localhost:2808/inventory/motif_keluar/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"motif_keluar_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"2","motif_keluar_id":"2","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","motif":"Motif A","qty":"10","harga":"0","subtotal":"0","ket":null,"promo":"tidak"},{"id":"3","motif_keluar_id":"2","motif_id":"1","barang_id":"0","type_id":"0","nama":"Motif A","motif":null,"qty":"4","harga":"0","subtotal":"0","ket":"PROMO","promo":"ya"},{"id":"4","motif_keluar_id":"2","motif_id":"1","barang_id":"0","type_id":"0","nama":"Motif A","motif":null,"qty":"4","harga":"0","subtotal":"0","ket":"PROMO","promo":"ya"}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_keluar_id":"2","customer_id":"1"}'),
+(52, '2017-01-19 11:54:08', 1, 'http://localhost:2808/inventory/motif_masuk/simpan', 'Admin istrator telah menambahkan motif masuk dengan supplier Supplier A', '{"motif_masuk_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"14","motif_masuk_id":"10","motif_id":"1","barang_id":"2","type_id":"1","nama":"Motif A","qty":"10","harga":"0","subtotal":"0","ket":null}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_masuk_id":"10","supplier_id":"1"}'),
+(53, '2017-01-19 07:19:43', 1, 'http://localhost:2808/inventory/motif_keluar/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"motif_keluar_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"5","motif_keluar_id":"3","motif_id":"1","barang_id":"2","type_id":"1","nama":"Motif A","motif":"Motif A","qty":"3","harga":"0","subtotal":"0","ket":null,"promo":"tidak"}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_keluar_id":"3","customer_id":"1"}'),
+(54, '2017-01-23 19:04:46', 1, 'http://localhost/web/inventory/stok_opname/stok/update/1', 'Admin istrator mengubah stok barang Barang A (1) dari  menjadi 20', '{"qty":"20"}'),
+(55, '2017-01-23 21:16:06', 1, 'http://localhost/web/inventory/master/promo/index/insert', 'ID User ''1'' telah menambahkan promo ''3''', '{"barang_id":"1","type_id":"1","beli":"5","gratis":"1"}'),
+(56, '2017-01-23 21:17:20', 1, 'http://localhost/web/inventory/master/motif/index/update/1', 'Admin istrator telah mengedit motif Motif A (1)', '{"nama":"Motif A","harga":"0","type_id":"1","barang_id":"1","ket":"-"}'),
+(57, '2017-01-23 21:44:57', 1, 'http://localhost/web/inventory/motif_keluar/simpan', 'Admin istrator telah menambahkan motif keluar dengan customer Customer A', '{"motif_keluar_detail":{"conn_id":{"affected_rows":null,"client_info":null,"client_version":null,"connect_errno":null,"connect_error":null,"errno":null,"error":null,"error_list":null,"field_count":null,"host_info":null,"info":null,"insert_id":null,"server_info":null,"server_version":null,"stat":null,"sqlstate":null,"protocol_version":null,"thread_id":null,"warning_count":null},"result_id":{"current_field":null,"field_count":null,"lengths":null,"num_rows":null,"type":null},"result_array":[],"result_object":[{"id":"6","motif_keluar_id":"4","motif_id":"1","barang_id":"1","type_id":"1","nama":"Motif A","motif":"Motif A","qty":"7","harga":"0","subtotal":"0","ket":"ini","promo":"tidak"},{"id":"7","motif_keluar_id":"4","motif_id":"0","barang_id":"1","type_id":"1","nama":"Motif A","motif":null,"qty":"1","harga":"0","subtotal":"0","ket":"PROMO","promo":"ya"}],"custom_result_object":[],"current_row":0,"num_rows":null,"row_data":null},"motif_keluar_id":"4","customer_id":"1"}');
 
 --
 -- Indexes for dumped tables
@@ -832,27 +855,27 @@ ALTER TABLE `motif_barang`
 -- AUTO_INCREMENT for table `motif_keluar`
 --
 ALTER TABLE `motif_keluar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `motif_keluar_detail`
 --
 ALTER TABLE `motif_keluar_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `motif_masuk`
 --
 ALTER TABLE `motif_masuk`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT for table `motif_masuk_detail`
 --
 ALTER TABLE `motif_masuk_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 --
 -- AUTO_INCREMENT for table `promo`
 --
 ALTER TABLE `promo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `return`
 --
@@ -882,7 +905,7 @@ ALTER TABLE `supplier`
 -- AUTO_INCREMENT for table `surat_jalan`
 --
 ALTER TABLE `surat_jalan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `type`
 --
@@ -907,7 +930,7 @@ ALTER TABLE `users_groups`
 -- AUTO_INCREMENT for table `users_logs`
 --
 ALTER TABLE `users_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 --
 -- Constraints for dumped tables
 --

@@ -78,7 +78,7 @@
     <div class="row">
       <!-- accepted payments column -->
       <div class="col-xs-7">
-        
+        Keterangan : <?php echo $motif_keluar->keterangan; ?>
 
        
       </div>

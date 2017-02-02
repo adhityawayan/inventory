@@ -36,9 +36,7 @@
 					<td><?php echo $m->nama; ?></td>
 					<?php
 						//berdasarkan bulan 
-
 						for($i = 1; $i <= 12; $i++){
-
 							//mendapatkan motif masuk dan motif keluar bulan ini
 							$this->db->where("year(tanggal)",$tahun);
 							$this->db->where("month(tanggal)",$i);
@@ -78,7 +76,7 @@
 								}
 
 							}
-
+							
 
 							$this->db->where("year(tanggal)",$tahun);
 							$this->db->where("month(tanggal)",$i);
@@ -119,15 +117,30 @@
 							}
 
 
+
 							$stok_bulan_ini = $total_motif_masuk - $total_motif_keluar;
 
 							
 							//mendapatkan motif masuk dan motif keluar sebelumnya
-							$this->db->where("year(tanggal) <=",$tahun);
-							$this->db->where("month(tanggal) <",$i);
-							$this->db->where("tersimpan","sudah");
-							$this->db->order_by("tanggal","asc");
-							$motif_keluar_before = $this->db->get("motif_keluar");
+							// $this->db->where("year(tanggal) <=",$tahun,TRUE);
+							// $this->db->where("month(tanggal) <",$i,TRUE);
+							// $this->db->where("tersimpan","sudah");
+							// $this->db->order_by("tanggal","asc");
+							// $motif_keluar_before = $this->db->get("motif_keluar");
+
+							if ($i < 10){
+								$bln = "0".$i;
+							}else{
+								$bln = $i;
+							}
+
+							$tahun_bulan = $tahun."-".$bln;
+							$motif_keluar_before = $this->db->query('
+									SELECT *
+									FROM motif_keluar 
+									WHERE DATE_FORMAT(tanggal,"%Y-%m") < "'.$tahun_bulan.'" and tersimpan = "sudah"
+									order by tanggal asc
+								');
 
 							$total_motif_keluar_before = 0;
 							if ($motif_keluar_before->num_rows() > 0){
@@ -160,18 +173,26 @@
 
 							}
 
-							$this->db->where("year(tanggal) <=",$tahun);
-							$this->db->where("month(tanggal) <",$i);
-							$this->db->where("tersimpan","sudah");
-							$this->db->order_by("tanggal","asc");
-							$motif_masuk_before = $this->db->get("motif_masuk");
+							//echo " motif keluar seblmnya ".$total_motif_keluar_before;
+
+							// $this->db->where("year(tanggal) <=",$tahun,TRUE);
+							// $this->db->where("month(tanggal) <",$i,TRUE);
+							// $this->db->where("tersimpan","sudah");
+							// $this->db->order_by("tanggal","asc");
+							// $motif_masuk_before = $this->db->get("motif_masuk");
+
+							$motif_masuk_before = $this->db->query('
+									SELECT *
+									FROM motif_masuk 
+									WHERE DATE_FORMAT(tanggal,"%Y-%m") < "'.$tahun_bulan.'" and tersimpan = "sudah"
+									order by tanggal asc
+								');
 
 							$total_motif_masuk_before = 0;
 							if ($motif_masuk_before->num_rows() > 0){
-
 								foreach ($motif_masuk_before->result() as $bk) {
 									
-									$this->db->where("motif_keluar_id",$bk->id);
+									$this->db->where("motif_masuk_id",$bk->id);
 
 									$this->db->where_in("motif_id",$m->id);
 
@@ -182,11 +203,11 @@
 									if ($type_id != "semua"){
 										$this->db->where("type_id",$type_id);
 									}
-									$motif_keluar_detail = $this->db->get("motif_keluar_detail");
+									$motif_masuk_detail = $this->db->get("motif_masuk_detail");
 
-									if ($motif_keluar_detail->num_rows() > 0){
+									if ($motif_masuk_detail->num_rows() > 0){
 										$jml_detail = 0;
-										foreach ($motif_keluar_detail->result() as $mkd) {
+										foreach ($motif_masuk_detail->result() as $mkd) {
 											$jml_detail += $mkd->qty;
 										}
 
@@ -197,10 +218,15 @@
 
 							}
 
+
+							//echo " motif masuk seblmnya ".$total_motif_masuk_before."<br>";
+							
+
 							$sisa_stok = $total_motif_masuk_before - $total_motif_keluar_before;
 
 
 							$hasil = $stok_bulan_ini + $sisa_stok;
+
 
 							$total_bulan[$i-1] += $hasil;
 

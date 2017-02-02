@@ -3,6 +3,8 @@
 		public function index(){
 
 			$data_motif = $this->_motif_dropdown();
+			$data_barang = $this->_barang_dropdown();
+			$data_type = $this->_type_dropdown();
 
 			$crud = new grocery_CRUD();
  
@@ -10,11 +12,13 @@
 			$crud->set_table('promo');
 			$crud->unset_read();
 			
-			$crud->display_as("motif_id","Motif");
+			$crud->display_as("barang_id","Barang");
+			$crud->display_as("type_id","Type");
 			$crud->display_as("beli","Jumlah Beli");
 			$crud->display_as("gratis","Jumlah Gratis");
 
-			$crud->field_type('motif_id','dropdown',$data_motif);
+			$crud->field_type('barang_id','dropdown',$data_barang);
+			$crud->field_type('type_id','dropdown',$data_type);
 
 
 
@@ -63,6 +67,58 @@
 			$this->db->select('id, nama');
 	        $this->db->order_by('nama','asc');
 	        $query = $this->db->get('motif');
+	        if ($query->num_rows() > 0)
+	        {
+	            $data = array();
+	            foreach ($query->result_array() as $row)
+	            {
+	                $data[$row['id']] = $row['nama']; 
+	            }
+	        }else{
+	        	$data[''] = '';
+	        }
+	        $query->free_result();
+	        return $data; 
+		}
+
+		private function _barang_dropdown(){
+			$data = array();
+
+			$this->db->select('id, nama');
+	        $this->db->order_by('nama','asc');
+	        $query = $this->db->get('barang');
+	        $maxkode = 20;
+
+	        if ($query->num_rows() > 0)
+	        {
+	            
+	            foreach ($query->result_array() as $row)
+	            {
+	            	$count = strlen($row['id']);
+		            $nbsp = "";
+	            	if ($maxkode >= $count){
+	            		$hit = $maxkode - $count;
+		            	for ($i=0; $i < $hit; $i++) { 
+		            		$nbsp .= "&nbsp;";
+		            	}
+	            	}else{
+	            		$nbsp = "&nbsp;&nbsp;";
+	            	}
+	            	
+
+	                $data[$row['id']] = $row['nama']; 
+	            }
+	        }else{
+	        	$data[''] = '';
+	        }
+	        $query->free_result();
+	        return $data; 
+		}
+
+		private function _type_dropdown(){
+			$this->db->select('id, nama');
+	        $this->db->order_by('id','asc');
+	        $query = $this->db->get('type');
 	        if ($query->num_rows() > 0)
 	        {
 	            $data = array();

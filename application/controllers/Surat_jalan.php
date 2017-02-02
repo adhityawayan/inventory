@@ -52,9 +52,9 @@
 				$insert = array(
 						'motif_keluar_id'	=> $motif_keluar_id,
 						'user_id'			=> $this->ion_auth->user()->row()->id,
-						'status_kirim'		=> '-',
-						'ship_to'			=> '-',
-						'nama_penerima'		=> '-',
+						'status_kirim'		=> $status_kirim,
+						'ship_to'			=> $ship_to,
+						'nama_penerima'		=> $nama_penerima,
 						'nama_customer'		=> $customer->nama,
 					);
 				$this->db->insert("surat_jalan",$insert);

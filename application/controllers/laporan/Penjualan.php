@@ -3,12 +3,16 @@
 		private $bulan = array("Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember");
 
 		public function index(){
+			$nama_barang = "Semua Barang";
+			$nama_type = "Semua Type";
+			$motif = $this->db->get("motif");
+
 			$this->data['header_title'] = "Laporan Penjualan";
 			$this->data['header_description'] = "";
 			$this->data['content'] = "admin/laporan_penjualan_view";
 			$this->data['tahun']	= date("Y");
-			$this->data['link']	= site_url('laporan/penjualan/cetak_tahun/'.date("Y"));
-			$this->data['box_title'] = "Laporan Penjualan Semua Barang semua type Tahun ".date("Y");
+			$this->data['link']	= site_url('laporan/penjualan/cetak_tahun/'.date("Y")."/semua/semua");
+			$this->data['box_title'] = "Laporan Penjualan $nama_barang $nama_type Tahun ".$this->input->post("tahun");
 			$this->data['table'] = "admin/laporan_penjualan_motif_tabel_view";
 			$this->data['barang'] = $this->_barang_dropdown();
 			$this->data['type'] = $this->_type_dropdown();
@@ -16,8 +20,9 @@
 			
 
 			
-			$motif = $this->db->get("motif");
 
+			$this->data['barang_id'] = "semua";
+			$this->data['type_id'] = "semua";
 			$this->data['motif'] = $motif;
 
 			$this->_render_page();

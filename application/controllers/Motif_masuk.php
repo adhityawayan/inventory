@@ -133,7 +133,7 @@
 
 			if ($r->tersimpan == "sudah"){
 				$motif_masuk_detail->unset_add();
-				$motif_masuk_detail->unset_edit();
+				// $motif_masuk_detail->unset_edit();
 				$motif_masuk_detail->unset_delete();
 			}
 			$motif_masuk_detail->display_as("motif_id","Motif");

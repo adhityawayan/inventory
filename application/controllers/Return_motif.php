@@ -247,7 +247,7 @@
 			$detail = $this->db->get("return_detail");
 
 			foreach ($detail->result() as $row) {
-				//$this->motif_model->tambah_stok($row->motif_id,$row->qty);
+				$this->motif_model->tambah_stok($row->motif_id,$row->qty);
 			}
 
 				$this->db->set("tersimpan","sudah");

@@ -23,18 +23,52 @@
 
 			$crud->columns('nama','qty','type_id','ket');
 
-			$crud->add_action("Edit Stok","","stok_opname/stok/edit");
+			//$crud->add_action("Edit Stok","","stok_opname/stok/edit");
 
 			$output = $crud->render();
 
 
 			$this->data['header_title'] = "Stok Opname";
 			$this->data['header_description'] = "";
-			$this->data['content'] = "admin/_templates/output_view";
+			$this->data['content'] = "admin/stok_opname";
 			$this->data['output'] = $this->_grocery_view($output);
 
 
 			$this->_render_page();
+		}
+
+		public function cetak(){
+			$data_type = $this->_type_dropdown();
+			$data_motif = $this->_motif_dropdown();
+
+			$crud = new grocery_CRUD();
+ 
+			$crud->set_subject('Stok Opname');
+			$crud->set_table('motif');
+
+			$crud->unset_read();
+			$crud->unset_add();
+			$crud->unset_edit();
+			$crud->unset_delete();
+
+			$crud->field_type('type_id','dropdown',$data_type);
+			$crud->field_type('motif_id','dropdown',$data_motif);
+
+			$crud->display_as("type_id","Type");
+			$crud->display_as("motif_id","Motif");
+
+			$crud->columns('nama','qty','type_id','ket');
+
+			//$crud->add_action("Edit Stok","","stok_opname/stok/edit");
+
+			$output = $crud->render();
+
+
+			$this->data['laporan_title'] = "<h3 class='page-header'>Laporan Stok Opname</h3>";
+			$this->data['content']					= 'admin/stok_opname';
+			$this->data['output'] = $this->_grocery_view($output);
+				
+			$this->_render_print();
 		}
 
 

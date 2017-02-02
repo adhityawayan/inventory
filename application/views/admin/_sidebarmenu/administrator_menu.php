@@ -13,6 +13,7 @@
   </ul>
 </li>
 <li <?php if ($this->uri->segment(1) == "stok_opname"){echo " class='active' "; } ?>><a href="<?php echo site_url('stok_opname') ?>"><i class="fa fa-edit"></i> <span>Stok Opname</span></a></li>
+<li <?php if ($this->uri->segment(1) == "penyesuaian_stok"){echo " class='active' "; } ?>><a href="<?php echo site_url('penyesuaian_stok') ?>"><i class="fa fa-edit"></i> <span>Penyesuaian Stok</span></a></li>
 
 <li <?php if ($this->uri->segment(1) == "motif_masuk" or $this->uri->segment(1) == "motif_keluar" or $this->uri->segment(1) == "return_motif"){echo " class='active' "; } ?> class="treeview" >
   <a href="#"><i class="fa fa-list"></i> <span>Transaksi</span> <i class="fa fa-angle-left pull-right"></i></a>
@@ -31,8 +32,7 @@
 <li <?php if ($this->uri->segment(1) == "laporan"){echo " class='active' "; } ?> class="treeview" >
   <a href="#"><i class="fa fa-print"></i> <span>Laporan</span> <i class="fa fa-angle-left pull-right"></i></a>
   <ul class="treeview-menu">
-    <li><a href="<?php echo site_url('laporan/motif_masuk'); ?>"><i class="fa fa-circle-o"></i> Laporan Motif Masuk</a></li>
-    <li><a href="<?php echo site_url('laporan/motif_keluar'); ?>"><i class="fa fa-circle-o"></i> Laporan Motif Keluar</a></li>
+    <li><a href="<?php echo site_url('laporan/motif'); ?>"><i class="fa fa-circle-o"></i> Laporan Motif Masuk & Keluar</a></li>
     <li><a href="<?php echo site_url('laporan/stok_terakhir'); ?>"><i class="fa fa-circle-o"></i> Laporan Stok Akhir</a></li>
     <li><a href="<?php echo site_url('laporan/penjualan'); ?>"><i class="fa fa-circle-o"></i> Laporan Penjualan</a></li>
   </ul>

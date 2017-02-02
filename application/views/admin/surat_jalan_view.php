@@ -72,8 +72,12 @@
   </div>
   <div class="col-xs-12 text-center">
     <?php
+      if ($surat_jalan->status_kirim == "ship_to") {
+        echo $surat_jalan->ship_to;
+      }else{
+        //echo $surat_jalan->nama_customer;
+      }
       
-      echo $surat_jalan->nama_customer;
     ?>
   </div>
 </div>
@@ -102,7 +106,16 @@
 					?>
 						<tr>
 							<td><span style="float:right;"><?php echo $row->qty; ?></span></td>
-              <td width="130"></td>
+              <td width="130">
+                <?php 
+                  $this->db->where("id",$row->type_id);
+                  $type = $this->db->get("type");
+                  if ($type->num_rows() > 0){
+                    echo $type->row()->nama; 
+                  }
+                ?>
+                  
+              </td>
               <td><?php echo $row->nama; ?></td>
 							<td><?php echo $row->motif; ?></td>
 							<td><?php if ($row->ket == null) {echo "-";}else{echo $row->ket;} ?></td>

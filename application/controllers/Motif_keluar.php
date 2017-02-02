@@ -16,6 +16,9 @@
 
 			$crud->required_fields('tanggal','customer_id');
 
+			$crud->unset_texteditor('keterangan');
+
+			//$crud->add_action("Edit","","motif_keluar/edit_motif");
 			$crud->add_action("Detail","","motif_keluar/detail");
 			$crud->add_action("Cetak Invoice","","invoice/cetak","custom_add_action");
 			$crud->add_action("Cetak Surat Jalan","","motif_keluar/detail");
@@ -63,6 +66,16 @@
 
 		}
 
+		function edit_motif() {
+
+			$this->db->set("tersimpan","belum");
+			$this->db->where("id",$this->uri->segment(3));
+
+			$this->db->update("motif_keluar");
+
+			redirect("motif_keluar/detail/".$this->uri->segment(3));
+		}
+
 		function log_add_motif_keluar($post_array,$primary_key){
 			$this->session->set_userdata('motif_keluar_id',$primary_key);
 
@@ -88,29 +101,75 @@
 			if (!$this->uri->segment(4) == "add" and !$this->uri->segment(4) == "edit" or $this->uri->segment(4) == "cetak_surat_jalan"){
 				
 				$cust = $this->db->get_where("customer",array("id",$r->customer_id))->row();
+				$ket = $this->session->userdata("ket_".$this->uri->segment(3));
+				if (strlen(trim($ket)) == 0){
+					$ket = $r->keterangan;
+				}
+				if ($r->tersimpan == "sudah"){
+						$output = '
+							<div class="box">
+								<div class="box-body">
+									<div class="row" id="qty_field_box">
+										<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+											<label>Tanggal</label>
+										</div>
+										<div class="col-lg-10" id="qty_input_box">
+											<p >'.date('d/m/Y',strtotime($r->tanggal)).'</p>
+										</div>
+									</div>
+									<div class="row" id="qty_field_box">
+										<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+											<label>Customer</label>
+										</div>
+										<div class="col-lg-10" id="qty_input_box">
+											<p>'.$cust->nama.'</p>
+										</div>
+									</div>
 
-				$output = '
-					<div class="box">
-						<div class="box-body">
-							<div class="row" id="qty_field_box">
-								<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
-									<label>Tanggal</label>
-								</div>
-								<div class="col-lg-10" id="qty_input_box">
-									<p >'.date('d/m/Y',strtotime($r->tanggal)).'</p>
+									<div class="row" id="qty_field_box">
+										<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+											<label>Keterangan</label>
+										</div>
+										<div class="col-lg-10" id="qty_input_box">'.$ket.'
+										</div>
+									</div>
 								</div>
 							</div>
-							<div class="row" id="qty_field_box">
-								<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
-									<label>Customer</label>
+						';
+				}else{
+					$output = '
+						<div class="box">
+							<div class="box-body">
+								<div class="row" id="qty_field_box">
+									<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+										<label>Tanggal</label>
+									</div>
+									<div class="col-lg-10" id="qty_input_box">
+										<p >'.date('d/m/Y',strtotime($r->tanggal)).'</p>
+									</div>
 								</div>
-								<div class="col-lg-10" id="qty_input_box">
-									<p>'.$cust->nama.'</p>
+								<div class="row" id="qty_field_box">
+									<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+										<label>Customer</label>
+									</div>
+									<div class="col-lg-10" id="qty_input_box">
+										<p>'.$cust->nama.'</p>
+									</div>
+								</div>
+
+								<div class="row" id="qty_field_box">
+									<div class="form-display-as-box col-lg-2 control-label" id="qty_display_as_box">
+										<label>Keterangan</label>
+									</div>
+									<div class="col-lg-10" id="qty_input_box">
+										<textarea id="ket_keluar" name="ket" class="form-control">'.trim($ket).'</textarea>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				';
+					';
+				}
+				
 
 			}else{
 				$output = "";
@@ -131,7 +190,7 @@
 
 			if ($r->tersimpan == "sudah"){
 				$motif_keluar_detail->unset_add();
-				$motif_keluar_detail->unset_edit();
+				// $motif_keluar_detail->unset_edit();
 				$motif_keluar_detail->unset_delete();
 			}
 			$motif_keluar_detail->display_as("motif_id","Motif");
@@ -324,7 +383,8 @@
 
 			foreach ($data->result() as $row) {
 				//cek promo
-				$this->db->where("motif_id",$row->motif_id);
+				$this->db->where("barang_id",$row->barang_id);
+				$this->db->where("type_id",$row->type_id);
 				$promo = $this->db->get("promo")->row();
 
 				$bagi = $row->qty / $promo->beli;
@@ -334,7 +394,8 @@
 					
 					$arr = array(
 							'motif_keluar_id' => $motif_keluar_id,
-							'motif_id'			=> $row->motif_id,
+							'barang_id'			=> $row->barang_id,
+							'type_id'			=> $row->type_id,
 							'nama'				=> $row->nama,
 							'qty'				=> $dapat,
 							'harga'				=> 0,
@@ -354,6 +415,7 @@
 			}
 
 			$this->db->set("tersimpan","sudah");
+			$this->db->set("keterangan",$this->session->userdata("ket_".$this->input->post('motif_keluar_id')));
 			$this->db->where("id",$this->input->post('motif_keluar_id'));
 			$this->db->update("motif_keluar");
 			
@@ -391,6 +453,14 @@
 			$this->db->delete("motif_keluar_detail");	
 
 			redirect('motif_keluar','refresh');
+		}
+
+
+		public function set_keterangan() {
+			$ket = $this->input->post("ket");
+			$motif_keluar_id = $this->input->post("motif_keluar_id");
+
+			$this->session->set_userdata("ket_".$motif_keluar_id,$ket);
 		}
 
 		private function _barang_dropdown(){

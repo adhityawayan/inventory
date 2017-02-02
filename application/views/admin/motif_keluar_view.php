@@ -28,7 +28,8 @@
 			<div class="box-body">
 				<table class="table table-borderd">
 					<tr>
-						<th>Nama motif</th>
+						<th>Nama Barang</th>
+						<th>Nama Type</th>
 						<th>Gratis</th>
 					</tr>
 					<?php
@@ -40,8 +41,14 @@
 
 						foreach ($data->result() as $row) {
 							//cek promo
-							$this->db->where("motif_id",$row->motif_id);
-							$promo = $this->db->get("promo");
+							//$this->db->where("motif_id",$row->motif_id);
+							$this->db->select("*, barang.nama as barang_nama, type.nama as type_nama");
+							$this->db->from("promo");
+							$this->db->where("barang_id",$row->barang_id);
+							$this->db->where("type_id",$row->type_id);
+							$this->db->join("barang","barang.id = promo.barang_id");
+							$this->db->join("type","type.id = promo.type_id");
+							$promo = $this->db->get();
 
 							if ($promo->num_rows() > 0){
 								$promo = $promo->row();
@@ -51,7 +58,8 @@
 
 									?>
 										<tr>
-											<td><?php echo $row->nama; ?></td>
+											<td><?php echo $promo->barang_nama; ?></td>
+											<td><?php echo $promo->type_nama; ?></td>
 											<td><?php echo $bagi*$promo->gratis; ?></td>
 										</tr>
 									<?php
@@ -132,3 +140,5 @@
 	</div>
 </div>
 <?php } ?>
+
+
